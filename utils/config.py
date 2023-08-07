@@ -1,6 +1,5 @@
 from dotenv import dotenv_values
 import os
-import streamlit as st
 from configparser import ConfigParser 
 
 def load_config():
@@ -13,22 +12,24 @@ def load_config():
     if os.path.exists('.env'):
         config = dotenv_values(".env")
         os.environ['OPENAI_API_KEY'] = config["OPENAI_API_KEY"]
-    else:
-        config = {}
-        config['DEEPCHECKS_LLM_API_KEY'] = st.secrets['DEEPCHECKS_LLM_API_KEY']
-        config['DEEPCHECKS_LLM_HOST_URL'] = st.secrets['DEEPCHECKS_LLM_HOST_URL']
 
     cp = ConfigParser()
     cp.read('./config.ini')
-    config['DEEPCHECKS_LLM_APP_NAME'] = cp.get('DEEPCHECKS_LLM_APP', 'DEEPCHECKS_LLM_APP_NAME')
-    config['DEEPCHECKS_LLM_APP_VERSION_NAME'] = cp.get('DEEPCHECKS_LLM_APP','DEEPCHECKS_LLM_APP_VERSION_NAME')
+    config['TOXICITY'] = cp.get('CORRUPT_PROPERTIES', 'TOXICITY')
+    config['AVOIDANCE'] = cp.get('CORRUPT_PROPERTIES', 'AVOIDANCE')
+    config['RELEVANCE'] = cp.get('CORRUPT_PROPERTIES', 'RELEVANCE')
+    config['READABILITY'] = cp.get('CORRUPT_PROPERTIES', 'READABILITY')
+    config['HALLUCINATIONS'] = cp.get('CORRUPT_PROPERTIES', 'HALLUCINATIONS')
     return config
 
-def update_config(app_name, app_version):
+def update_config(toxicity_percent, avoidance_percent, relevance_percent, readability_percent, hallucinations_percent):
     # Write the updated environment variables to the .env file
     cp = ConfigParser()
     cp.read('./config.ini')
-    cp.set('DEEPCHECKS_LLM_APP', 'DEEPCHECKS_LLM_APP_NAME', app_name)
-    cp.set('DEEPCHECKS_LLM_APP', 'DEEPCHECKS_LLM_APP_VERSION_NAME', app_version)
+    cp.set('CORRUPT_PROPERTIES', 'TOXICITY', str(toxicity_percent))
+    cp.set('CORRUPT_PROPERTIES', 'AVOIDANCE', str(avoidance_percent))
+    cp.set('CORRUPT_PROPERTIES', 'RELEVANCE', str(relevance_percent))
+    cp.set('CORRUPT_PROPERTIES', 'READABILITY', str(readability_percent))
+    cp.set('CORRUPT_PROPERTIES', 'HALLUCINATIONS', str(hallucinations_percent))
     with open('config.ini', 'w') as configfile:
         cp.write(configfile)

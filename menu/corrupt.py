@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 # import uuid
 # from utils.general_utils import load_vector_embeddings
 
@@ -7,7 +8,10 @@ def create_ask_deepy_bot():
     # vector_embeddings = load_vector_embeddings()
 
     st.markdown("""Hi there! my name is Deepy. I am here to answer any HR related questions you may have.""")
-
+    upload_file = st.file_uploader("Upload CSV", type=['csv','xls','xlsx'], disabled=True)
+    if upload_file is not None:
+        dataframe = pd.read_csv(upload_file, encoding='latin-1')
+        st.write(dataframe)
     # with st.form("user_input"):
     #     user_input = st.text_area("User Input:", key="input", placeholder="Enter your question...")
     #     submit_button = st.form_submit_button('Submit', use_container_width=True, type="primary")

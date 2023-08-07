@@ -1,6 +1,6 @@
 """Python file to serve as the frontend"""
 import streamlit as st
-# from utils.config import load_config
+from utils.config import load_config
 from utils.general_utils import initialize_app, initialize_session_state
 from menu.corrupt import create_ask_deepy_bot
 from menu.settings import create_settings
@@ -10,7 +10,7 @@ from menu.settings import create_settings
 initialize_app()
 
 # Load the configuration
-# config = load_config()
+config = load_config()
 
 initialize_session_state()
 
@@ -32,6 +32,6 @@ if st.session_state.current_page == 'Settings':
     st.session_state.annotation_message = ""
     st.session_state.llm_response = ""
     st.session_state.ext_interaction_id = ""
-    create_settings()
+    create_settings(config)
 else:
     create_ask_deepy_bot()
