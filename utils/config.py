@@ -10,11 +10,12 @@ def load_config():
     OrderDict containing all the variables from the .env file.
     """
     if os.path.exists('.env'):
-        config = dotenv_values(".env")
-        os.environ['OPENAI_API_KEY'] = config["OPENAI_API_KEY"]
+        env = dotenv_values(".env")
+        os.environ['OPENAI_API_KEY'] = env["OPENAI_API_KEY"]
 
     cp = ConfigParser()
     cp.read('./config.ini')
+    config = {}
     config['TOXICITY'] = cp.get('CORRUPT_PROPERTIES', 'TOXICITY')
     config['AVOIDANCE'] = cp.get('CORRUPT_PROPERTIES', 'AVOIDANCE')
     config['RELEVANCE'] = cp.get('CORRUPT_PROPERTIES', 'RELEVANCE')
