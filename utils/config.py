@@ -24,7 +24,7 @@ def load_config():
     return config
 
 def update_config(toxicity_percent, avoidance_percent, relevance_percent, readability_percent, hallucinations_percent):
-    # Write the updated environment variables to the .env file
+    # Write the updated environment variables to the config.ini file
     cp = ConfigParser()
     cp.read('./config.ini')
     cp.set('CORRUPT_PROPERTIES', 'TOXICITY', str(toxicity_percent))

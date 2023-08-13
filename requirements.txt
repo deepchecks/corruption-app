@@ -6,3 +6,7 @@ uuid
 Pillow~=9.4.0
 streamlit_option_menu
 configparser
+pybind11
+openpyxl
+numpy
+deepchecks[nlp, nlp-properties]@git+https://github.com/deepchecks/deepchecks.git@79ad491712759e7513146bfe7504a58305599272
