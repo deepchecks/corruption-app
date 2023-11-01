@@ -4,8 +4,10 @@ from PIL import Image
 from pathlib import Path
 import streamlit as st
 from streamlit_option_menu import option_menu
+
 import pandas as pd
 import numpy as np
+from deepchecks.nlp.utils.text_properties import sentiment, readability_score, text_length
 
 if platform.system() == 'Windows':
     pathlib.PosixPath = pathlib.WindowsPath
@@ -83,23 +85,37 @@ def initialize_session_state():
         st.session_state.current_page = ""
     if "dataset" not in st.session_state:
         st.session_state.dataset = pd.DataFrame()
+    if "corrupted_dataset" not in st.session_state:
+        st.session_state.corrupted_dataset = pd.DataFrame()
+    if "relevance" not in st.session_state:
+        st.session_state.relevance = 0
+    if "readability" not in st.session_state:
+        st.session_state.readability = 0
+    if "sentiment" not in st.session_state:
+        st.session_state.sentiment = 0
+    if "text_length" not in st.session_state:
+        st.session_state.text_length = 0
 
 
 def preprocess_dataset(dataset: pd.DataFrame):
     preprocessed_data = dataset[['user_input', 'response']]
     return preprocessed_data
 
-def randomize_dataset(model_responses: pd.Series, config):
-    readability_percent = int(config['READABILITY'])
-    relevance_percent = int(config['RELEVANCE'])
+def randomize_dataset(model_responses: pd.Series,
+                      readability_percent: int,
+                      relevance_percent: int,
+                      sentiment_precent: int,
+                      text_length_percent: int):
     percentages = {
         'Readability': readability_percent,
-        'Relevance': relevance_percent
+        'Relevance': relevance_percent,
+        'Sentiment': sentiment_precent,
+        'Text Length': text_length_percent
     }
     total_size = len(model_responses)
 
     # Generate random indices for the combined sample
-    sample_size = int(total_size * (readability_percent + relevance_percent) / 100)
+    sample_size = int(total_size * (readability_percent + relevance_percent + sentiment_precent + text_length_percent) / 100)
     random_indices = np.random.choice(total_size, size=sample_size, replace=False)
 
     # Create a dictionary to store the random responses
@@ -122,9 +138,23 @@ def generate_data_for_corrupt_dataframe(random_data, corrupted_response, corrupt
     corrupted_data_info = []
     for idx, response in enumerate(corrupted_response):
         data = []
-        data.append(st.session_state.dataset.iloc[random_data[corrupted_property]['indices'][idx]]['user_input'])
-        data.append(random_data[corrupted_property]['data'][idx])
+        user_input = st.session_state.dataset.iloc[random_data[corrupted_property]['indices'][idx]]['user_input']
+        original_response = random_data[corrupted_property]['data'][idx]
+        data.append(user_input)
+        data.append(original_response)
         data.append(response)
+        if corrupted_property == 'Readability':
+            data.append(readability_score(original_response))
+            data.append(readability_score(response))
+        elif corrupted_property == 'Relevance':
+            data.append('')
+            data.append('')
+        elif corrupted_property == 'Sentiment':
+            data.append(sentiment(original_response))
+            data.append(sentiment(response))
+        elif corrupted_property == 'Text Length':
+            data.append(text_length(original_response))
+            data.append(text_length(response))
         data.append(corrupted_property)
         corrupted_data_info.append(data)
     return corrupted_data_info

@@ -19,13 +19,13 @@ except RuntimeError as e:
 initialize_app()
 
 # Load the configuration
-config = load_config()
+# config = load_config()
 
 # Initialize the session states
 initialize_session_state()
 
 # Render the page according to current page
 if st.session_state.current_page == 'Settings':
-    create_settings(config)
+    create_settings()
 else:
-    asyncio.run(create_corrupt_data_page(config))
+    asyncio.run(create_corrupt_data_page())

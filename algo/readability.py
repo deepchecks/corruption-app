@@ -1,8 +1,6 @@
-import openai
 from deepchecks.nlp.utils.text_properties import readability_score
 from utils.openai_utils import get_answers_with_backoff
 
-openai.api_key = "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"
 
 def corrupt_readability(model_response, model_response_readability_score, difference = 15, max_iter = 3):
 
