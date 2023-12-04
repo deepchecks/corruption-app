@@ -1,4 +1,3 @@
-openai
 python-dotenv
 streamlit
 uuid
@@ -11,3 +10,4 @@ numpy
 torch
 # pandas==1.3.5
 deepchecks[nlp, nlp-properties]@git+https://github.com/deepchecks/deepchecks.git@3eaca244739b714fc54322df27df573662d7ac33
+openai==0.28
