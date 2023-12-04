@@ -24,9 +24,8 @@ def initialize_app():
     with st.sidebar:
         page = option_menu(
                     "",  # empty title
-                    ["Corrupt Data", "Settings"],
-                    icons=['robot', 'gear-fill'],
-                    # https://icons.getbootstrap.com/
+                    ["Corrupt Data"],
+                    icons=['robot'],
                     default_index=0,
                     styles={
                         "container": {"border-radius": "1"},
@@ -37,7 +36,6 @@ def initialize_app():
                                             "color": "black"}
             }
         )
-        st.session_state.current_page = page
     st.markdown("""
         <style>
             /* Sidebar */
@@ -81,8 +79,6 @@ def initialize_app():
 
 
 def initialize_session_state():
-    if "current_page" not in  st.session_state:
-        st.session_state.current_page = ""
     if "dataset" not in st.session_state:
         st.session_state.dataset = pd.DataFrame()
     if "corrupted_dataset" not in st.session_state:
@@ -95,6 +91,12 @@ def initialize_session_state():
         st.session_state.sentiment = 0
     if "text_length" not in st.session_state:
         st.session_state.text_length = 0
+    if "text_style" not in st.session_state:
+        st.session_state.text_style = 0
+    if "toxicity" not in st.session_state:
+        st.session_state.toxicity = 0
+    if "hallucination" not in st.session_state:
+        st.session_state.hallucination = 0
 
 
 def preprocess_dataset(dataset: pd.DataFrame):

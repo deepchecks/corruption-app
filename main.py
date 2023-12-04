@@ -3,7 +3,6 @@ import streamlit as st
 from utils.config import load_config
 from utils.general_utils import initialize_app, initialize_session_state
 from menu.corrupt import create_corrupt_data_page
-from menu.settings import create_settings
 import asyncio
 
 try:
@@ -19,13 +18,9 @@ except RuntimeError as e:
 initialize_app()
 
 # Load the configuration
-# config = load_config()
+config = load_config()
 
 # Initialize the session states
 initialize_session_state()
 
-# Render the page according to current page
-if st.session_state.current_page == 'Settings':
-    create_settings()
-else:
-    asyncio.run(create_corrupt_data_page())
+asyncio.run(create_corrupt_data_page())
