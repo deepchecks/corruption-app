@@ -8,6 +8,6 @@ def load_config():
     -------
     OrderDict containing all the variables from the .env file.
     """
-    env = dotenv_values(".env")
-    os.environ['OPENAI_API_KEY'] = env["OPENAI_API_KEY"]
-
+    if os.path.exists('.env'):
+        config = dotenv_values(".env")
+        os.environ['OPENAI_API_KEY'] = config["OPENAI_API_KEY"]
