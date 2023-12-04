@@ -83,7 +83,6 @@ async def create_corrupt_data_page():
                     corrupted_data.extend(generate_data_for_corrupt_dataframe(random_data=random_data,
                                                                               corrupted_response=text_length_api_response,
                                                                               corrupted_property='Text Length'))
-                    st.write(random_data)
                     corrupted_dataset = pd.DataFrame(corrupted_data, columns=['user_input', 'original_response', 'corrupted_response', 'original_property_value', 'corrupted_property_value', 'corrupted_property'])
                     st.session_state.corrupted_dataset = corrupted_dataset
             if len(st.session_state.corrupted_dataset) > 0:
