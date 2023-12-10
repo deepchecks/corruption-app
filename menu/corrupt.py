@@ -1,13 +1,15 @@
 import streamlit as st
 import asyncio
 import pandas as pd
-
-from utils.general_utils import preprocess_dataset, randomize_dataset, generate_data_for_corrupt_dataframe
+import time
 from deepchecks.nlp.utils.text_properties import readability_score, sentiment, text_length
+
+from utils.corrupt_dataset import preprocess_dataset, randomize_dataset, generate_data_for_corrupt_dataframe, generate_dataset_to_download, generate_corrupted_dataframe_to_display
 from algo.readability import corrupt_readability
 from algo.relevance import corrupt_relevance
 from algo.sentiment import corrupt_sentiment
 from algo.text_length import corrupt_text_length
+
 
 async def create_corrupt_data_page():
 
@@ -20,10 +22,11 @@ async def create_corrupt_data_page():
     with cols[1]:
         st.markdown('<div style="padding:23px;">',unsafe_allow_html=True)
         st.download_button(label='Example dataset',
-                           help='''A csv file with the following columns:\n- user_input - the input to the pipeline \
+                           help='''A csv file with the following columns:\n- user_interaction_id - unique acorss the version (optional) \
+                            \n- input - the input to the pipeline \
                             \n- information_retrieval - the information supplied as context to the llm \
                             \n- full_prompt - the full text sent to the LLM \
-                            \n- response - the pipeline final output \
+                            \n- output - the pipeline final output \
                             \n- annotation - either good/bad/empty''',
                            data='hello',
                            file_name='corrupted_dataset.csv')
@@ -32,7 +35,19 @@ async def create_corrupt_data_page():
     if upload_file is not None:
         with st.spinner('Uploading dataset...'):
             dataframe = pd.read_csv(upload_file, encoding='latin-1') if upload_file.type != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' else pd.read_excel(upload_file)
-            st.session_state.dataset = dataframe
+            is_valid_dataframe = True
+            cols_to_check = ['input', 'information_retrieval', 'full_prompt', 'output', 'annotation']
+            for col in cols_to_check:
+                if col not in dataframe.columns:
+                    is_valid_dataframe = False
+                    break
+            if not is_valid_dataframe:
+                st.warning('The uploaded CSV does not contain all the required columns!!')
+                return
+            if len(dataframe) > 1000:
+                st.warning('Only the first 1000 rows will be considered for corrupting the properties!!')
+            if is_valid_dataframe:
+                st.session_state.dataset = dataframe.iloc[0: 1000]
         if len(st.session_state.dataset) > 0:
             row_one = st.columns(3)
             row_two = st.columns(3)
@@ -46,47 +61,97 @@ async def create_corrupt_data_page():
                 toxicity_percent = st.slider("Toxicity", 0, 5, st.session_state.toxicity)
             with row_two[1]:
                 relevance_percent = st.slider("Relevance", 0, 5, st.session_state.relevance)
-            with row_two[2]:
-                hallucination_percent = st.slider("Hallucination", 0, 5, st.session_state.hallucination)
+            # with row_two[2]:
+            #     hallucination_percent = st.slider("Hallucination", 0, 5, st.session_state.hallucination)
 
-            corrupt_data = st.button('Corrupt Dataset', help='Corrupt dataset basaed on the percentage of data selected for each property in settings section')
+            corrupt_data = st.button(label='Corrupt Dataset',
+                                     key='corrupt_data_button',
+                                     help='Corrupt dataset basaed on the percentage of data selected for each property in settings section')
             if corrupt_data:
                 st.session_state.readability = int(readability_percent)
                 st.session_state.relevance = int(relevance_percent)
                 st.session_state.sentiment = int(sentiment_percent)
                 st.session_state.text_length = int(text_length_percent)
 
-                st.session_state.hallucination = int(hallucination_percent)
+                # st.session_state.hallucination = int(hallucination_percent)
                 st.session_state.toxicity = int(toxicity_percent)
-
-                with st.spinner('Corrupting the data...'):
-                    corrupted_data = []
+                progress_text = "Corrupting the data. Please wait."
+                percent_complete = 0
+                corruption_progress_bar = st.progress(0, text=progress_text)
+                corrupted_data = []
+                try:
                     preprocessed_data = preprocess_dataset(st.session_state.dataset)
-                    random_data = randomize_dataset(model_responses=preprocessed_data['response'], 
+                    random_data = randomize_dataset(model_responses=preprocessed_data['output'], 
                                                     readability_percent=st.session_state.readability,
                                                     relevance_percent=st.session_state.relevance,
                                                     sentiment_precent=st.session_state.sentiment,
                                                     text_length_percent=st.session_state.text_length)
+                    time.sleep(1)
+                    percent_complete += 5
+                    corruption_progress_bar.progress(percent_complete, text='Corrupting readability property...')
                     readability_api_response = await asyncio.gather(*[corrupt_readability(model_response.strip(), readability_score(model_response.strip())) for model_response in random_data['Readability']['data']])
-                    relevance_api_response = await asyncio.gather(*[corrupt_relevance(model_response.strip()) for model_response in random_data['Relevance']['data']])
+                    percent_complete += 15
+                    corruption_progress_bar.progress(percent_complete, text='Corrupted readability property successfully...')
+
+                    time.sleep(1)
+                    percent_complete += 5
+                    corruption_progress_bar.progress(percent_complete, text='Corrupting sentiment property...')
                     sentiment_api_response = await asyncio.gather(*[corrupt_sentiment(model_response.strip(), sentiment(model_response.strip())) for model_response in random_data['Sentiment']['data']])
+                    percent_complete += 15
+                    corruption_progress_bar.progress(percent_complete, text='Corrupted sentiment property successfully...')
+
+                    time.sleep(1)
+                    percent_complete += 5
+                    corruption_progress_bar.progress(percent_complete, text='Corrupting text length property...')
                     text_length_api_response = await asyncio.gather(*[corrupt_text_length(model_response.strip(), text_length(model_response.strip())) for model_response in random_data['Text Length']['data']])
+                    percent_complete += 15
+                    corruption_progress_bar.progress(percent_complete, text='Corrupted text length property successfully...')
+
+                    time.sleep(1)
+                    percent_complete += 5
+                    corruption_progress_bar.progress(percent_complete, text='Corrupting relevance property...')
+                    relevance_api_response = await asyncio.gather(*[corrupt_relevance(model_response.strip()) for model_response in random_data['Relevance']['data']])
+                    percent_complete += 15
+                    corruption_progress_bar.progress(percent_complete, text='Corrupted relevance property successfully...')
+
+                    time.sleep(1)
+                    percent_complete += 5
+                    corruption_progress_bar.progress(percent_complete, text='Corrupting toxicity property...')
+                    # relevance_api_response = await asyncio.gather(*[corrupt_relevance(model_response.strip()) for model_response in random_data['Relevance']['data']])
+                    percent_complete += 10
+                    corruption_progress_bar.progress(percent_complete, text='Corrupted toxicity property successfully...')
+
+                    time.sleep(1)
+                    percent_complete += 3
+                    corruption_progress_bar.progress(percent_complete, text='Generating the corrupted dataset...')
                     corrupted_data.extend(generate_data_for_corrupt_dataframe(random_data=random_data,
-                                                                              corrupted_response=readability_api_response,
-                                                                              corrupted_property='Readability'))
+                                                                            corrupted_response=readability_api_response,
+                                                                            corrupted_property='Readability'))
                     corrupted_data.extend(generate_data_for_corrupt_dataframe(random_data=random_data,
-                                                                              corrupted_response=relevance_api_response,
-                                                                              corrupted_property='Relevance'))
+                                                                            corrupted_response=relevance_api_response,
+                                                                            corrupted_property='Relevance'))
                     corrupted_data.extend(generate_data_for_corrupt_dataframe(random_data=random_data,
-                                                                              corrupted_response=sentiment_api_response,
-                                                                              corrupted_property='Sentiment'))
+                                                                            corrupted_response=sentiment_api_response,
+                                                                            corrupted_property='Sentiment'))
                     corrupted_data.extend(generate_data_for_corrupt_dataframe(random_data=random_data,
-                                                                              corrupted_response=text_length_api_response,
-                                                                              corrupted_property='Text Length'))
-                    corrupted_dataset = pd.DataFrame(corrupted_data, columns=['user_input', 'original_response', 'corrupted_response', 'original_property_value', 'corrupted_property_value', 'corrupted_property'])
+                                                                            corrupted_response=text_length_api_response,
+                                                                            corrupted_property='Text Length'))
+                    corrupted_dataset = pd.DataFrame(corrupted_data, columns=['input', 'original_response', 'corrupted_response', 'corrupted_property'])
+                    time.sleep(1)
+                    percent_complete += 2
+                    corruption_progress_bar.progress(percent_complete, text='Corrupted dataset generated successfully!!')
+                    time.sleep(1)
+                    corruption_progress_bar.empty()
                     st.session_state.corrupted_dataset = corrupted_dataset
+                except Exception as e:
+                    corruption_progress_bar.empty()
+                    st.write(e)
             if len(st.session_state.corrupted_dataset) > 0:
-                st.write(st.session_state.corrupted_dataset)
+                dataframe_to_display = generate_corrupted_dataframe_to_display(st.session_state.corrupted_dataset, 2)
+                st.dataframe(dataframe_to_display, hide_index=True)
+                merged_dataset = generate_dataset_to_download(st.session_state.dataset, st.session_state.corrupted_dataset)
                 st.download_button(label='Download corrupted dataset',
-                                   data=st.session_state.corrupted_dataset.to_csv(index=False).encode('utf-8'),
+                                   data=merged_dataset.to_csv(index=False).encode('utf-8'),
                                    file_name='corrupted_dataset.csv')
+
+
