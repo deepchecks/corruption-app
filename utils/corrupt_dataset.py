@@ -84,9 +84,9 @@ def generate_corrupted_dataframe_to_display(corrupted_dataset: pd.DataFrame, MAX
         if corrupted_property_count[corrupted_dataset.iloc[idx]['corrupted_property']] >= MAX_ROWS_PER_PROP:
             continue
         corrupted_property_count[corrupted_dataset.iloc[idx]['corrupted_property']] += 1
-        df = pd.DataFrame({'input': corrupted_dataset.iloc[idx]['input'],
-                           'original_response': corrupted_dataset.iloc[idx]['original_response'],
-                           'corrupted_response': corrupted_dataset.iloc[idx]['corrupted_response'],
-                           'corrupted_property': corrupted_dataset.iloc[idx]['corrupted_property']})
+        df = pd.DataFrame({'input': [corrupted_dataset.iloc[idx]['input']],
+                           'original_response': [corrupted_dataset.iloc[idx]['original_response']],
+                           'corrupted_response': [corrupted_dataset.iloc[idx]['corrupted_response']],
+                           'corrupted_property': [corrupted_dataset.iloc[idx]['corrupted_property']]})
         dataframe_to_display = pd.concat([dataframe_to_display, df], ignore_index=True)
     return dataframe_to_display
