@@ -61,8 +61,8 @@ async def create_corrupt_data_page():
                 toxicity_percent = st.slider("Toxicity", 0, 5, st.session_state.toxicity)
             with row_two[1]:
                 relevance_percent = st.slider("Relevance", 0, 5, st.session_state.relevance)
-            # with row_two[2]:
-            #     hallucination_percent = st.slider("Hallucination", 0, 5, st.session_state.hallucination)
+            with row_two[2]:
+                hallucination_percent = st.slider("Hallucination", 0, 5, st.session_state.hallucination)
 
             corrupt_data = st.button(label='Corrupt Dataset',
                                      key='corrupt_data_button',
