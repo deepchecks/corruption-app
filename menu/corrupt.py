@@ -72,9 +72,9 @@ async def create_corrupt_data_page():
                 st.session_state.relevance = int(relevance_percent)
                 st.session_state.sentiment = int(sentiment_percent)
                 st.session_state.text_length = int(text_length_percent)
-
-                # st.session_state.hallucination = int(hallucination_percent)
+                st.session_state.hallucination = int(hallucination_percent)
                 st.session_state.toxicity = int(toxicity_percent)
+
                 progress_text = "Corrupting the data. Please wait."
                 percent_complete = 0
                 corruption_progress_bar = st.progress(0, text=progress_text)
