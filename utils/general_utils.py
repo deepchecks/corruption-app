@@ -57,15 +57,19 @@ def initialize_app():
             }
                 
 
-            /* Corrupt Dataset button */
+            /* Corrupt dataset and download corrupted dataset button */
             [data-testid=tooltipHoverTarget]>button,
+            [data-testid=stDownloadButton]>button,
+            [data-testid=stDownloadButton]>button:focus:not(:active),
             [data-testid=tooltipHoverTarget]>button:focus:not(:active) {
                 background-color: #7964FF;
                 color: white;
                 border: 1px solid #7964FF;
             }
             [data-testid=tooltipHoverTarget]>button:hover,
-            [data-testid=tooltipHoverTarget]>button:active {
+            [data-testid=tooltipHoverTarget]>button:active,
+            [data-testid=stDownloadButton]>button:hover,
+            [data-testid=stDownloadButton]>button:active {
                 background-color: #7964FF;
                 color: white;
                 opacity: 90%;

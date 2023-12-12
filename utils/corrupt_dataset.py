@@ -65,7 +65,7 @@ def generate_dataset_to_download(dataset: pd.DataFrame, corrupted_dataset: pd.Da
         annotation = dataset.iloc[idx]['annotation'] if "annotation" in dataset.columns else ""
         corrupted_record = corrupted_dataset[corrupted_dataset['input'] == input]
         if len(corrupted_record) > 0:
-            response = corrupted_record.iloc[0]['corrupted_response']
+            response = corrupted_record.iloc[0]['corrupted_output']
             annotation = ""
         data.append(input)
         data.append(information_retrieval)
@@ -79,14 +79,14 @@ def generate_dataset_to_download(dataset: pd.DataFrame, corrupted_dataset: pd.Da
 def generate_corrupted_dataframe_to_display(corrupted_dataset: pd.DataFrame, MAX_ROWS_PER_PROP: int):
 
     corrupted_property_count = {prop: 0 for prop in set(corrupted_dataset['corrupted_property'])}
-    dataframe_to_display = pd.DataFrame(columns=['input', 'original_response', 'corrupted_response', 'corrupted_property'])
+    dataframe_to_display = pd.DataFrame(columns=['input', 'original_output', 'corrupted_output', 'corrupted_property'])
     for idx in range(len(corrupted_dataset)):
         if corrupted_property_count[corrupted_dataset.iloc[idx]['corrupted_property']] >= MAX_ROWS_PER_PROP:
             continue
         corrupted_property_count[corrupted_dataset.iloc[idx]['corrupted_property']] += 1
         df = pd.DataFrame({'input': [corrupted_dataset.iloc[idx]['input']],
-                           'original_response': [corrupted_dataset.iloc[idx]['original_response']],
-                           'corrupted_response': [corrupted_dataset.iloc[idx]['corrupted_response']],
+                           'original_output': [corrupted_dataset.iloc[idx]['original_output']],
+                           'corrupted_output': [corrupted_dataset.iloc[idx]['corrupted_output']],
                            'corrupted_property': [corrupted_dataset.iloc[idx]['corrupted_property']]})
         dataframe_to_display = pd.concat([dataframe_to_display, df], ignore_index=True)
     return dataframe_to_display

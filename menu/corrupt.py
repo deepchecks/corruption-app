@@ -86,44 +86,60 @@ async def create_corrupt_data_page():
                                                     relevance_percent=st.session_state.relevance,
                                                     sentiment_precent=st.session_state.sentiment,
                                                     text_length_percent=st.session_state.text_length)
-                    time.sleep(1)
+                    if st.session_state.readability > 0:
+                        time.sleep(1)
                     percent_complete += 5
-                    corruption_progress_bar.progress(percent_complete, text='Corrupting readability property...')
+                    progress_text = 'Corrupting readability property...' if st.session_state.readability > 0 else progress_text
+                    corruption_progress_bar.progress(percent_complete, text=progress_text)
                     readability_api_response = await asyncio.gather(*[corrupt_readability(model_response.strip(), readability_score(model_response.strip())) for model_response in random_data['Readability']['data']])
                     percent_complete += 15
-                    corruption_progress_bar.progress(percent_complete, text='Corrupted readability property successfully...')
+                    progress_text = 'Corrupted readability property successfully...' if st.session_state.readability > 0 else progress_text
+                    corruption_progress_bar.progress(percent_complete, text=progress_text)
 
-                    time.sleep(1)
+                    if st.session_state.sentiment > 0:
+                        time.sleep(1)
                     percent_complete += 5
-                    corruption_progress_bar.progress(percent_complete, text='Corrupting sentiment property...')
+                    progress_text = 'Corrupting sentiment property...' if st.session_state.sentiment > 0 else progress_text
+                    corruption_progress_bar.progress(percent_complete, text=progress_text)
                     sentiment_api_response = await asyncio.gather(*[corrupt_sentiment(model_response.strip(), sentiment(model_response.strip())) for model_response in random_data['Sentiment']['data']])
                     percent_complete += 15
-                    corruption_progress_bar.progress(percent_complete, text='Corrupted sentiment property successfully...')
+                    progress_text = 'Corrupted sentiment property successfully...' if st.session_state.sentiment > 0 else progress_text
+                    corruption_progress_bar.progress(percent_complete, text=progress_text)
 
-                    time.sleep(1)
+                    if st.session_state.text_length > 0:
+                        time.sleep(1)
                     percent_complete += 5
-                    corruption_progress_bar.progress(percent_complete, text='Corrupting text length property...')
+                    progress_text = 'Corrupting text length property...' if st.session_state.text_length > 0 else progress_text
+                    corruption_progress_bar.progress(percent_complete, text=progress_text)
                     text_length_api_response = await asyncio.gather(*[corrupt_text_length(model_response.strip(), text_length(model_response.strip())) for model_response in random_data['Text Length']['data']])
                     percent_complete += 15
-                    corruption_progress_bar.progress(percent_complete, text='Corrupted text length property successfully...')
+                    progress_text = 'Corrupted text length property successfully...' if st.session_state.text_length > 0 else progress_text
+                    corruption_progress_bar.progress(percent_complete, text=progress_text)
 
-                    time.sleep(1)
+                    if st.session_state.relevance > 0:
+                        time.sleep(1)
                     percent_complete += 5
-                    corruption_progress_bar.progress(percent_complete, text='Corrupting relevance property...')
+                    progress_text = 'Corrupting relevance property...' if st.session_state.relevance > 0 else progress_text
+                    corruption_progress_bar.progress(percent_complete, text=progress_text)
                     relevance_api_response = await asyncio.gather(*[corrupt_relevance(model_response.strip()) for model_response in random_data['Relevance']['data']])
                     percent_complete += 15
-                    corruption_progress_bar.progress(percent_complete, text='Corrupted relevance property successfully...')
+                    progress_text = 'Corrupted relevance property successfully...' if st.session_state.relevance > 0 else progress_text
+                    corruption_progress_bar.progress(percent_complete, text=progress_text)
 
-                    time.sleep(1)
+                    if st.session_state.toxicity > 0:
+                        time.sleep(1)
                     percent_complete += 5
-                    corruption_progress_bar.progress(percent_complete, text='Corrupting toxicity property...')
+                    progress_text = 'Corrupting toxicity property...' if st.session_state.toxicity > 0 else progress_text
+                    corruption_progress_bar.progress(percent_complete, text=progress_text)
                     # relevance_api_response = await asyncio.gather(*[corrupt_relevance(model_response.strip()) for model_response in random_data['Relevance']['data']])
                     percent_complete += 10
-                    corruption_progress_bar.progress(percent_complete, text='Corrupted toxicity property successfully...')
+                    progress_text = 'Corrupted toxicity property successfully...' if st.session_state.toxicity > 0 else progress_text
+                    corruption_progress_bar.progress(percent_complete, text=progress_text)
 
                     time.sleep(1)
                     percent_complete += 3
-                    corruption_progress_bar.progress(percent_complete, text='Generating the corrupted dataset...')
+                    progress_text = 'Generating the corrupted dataset...'
+                    corruption_progress_bar.progress(percent_complete, text=progress_text)
                     corrupted_data.extend(generate_data_for_corrupt_dataframe(random_data=random_data,
                                                                             corrupted_response=readability_api_response,
                                                                             corrupted_property='Readability'))
@@ -136,10 +152,11 @@ async def create_corrupt_data_page():
                     corrupted_data.extend(generate_data_for_corrupt_dataframe(random_data=random_data,
                                                                             corrupted_response=text_length_api_response,
                                                                             corrupted_property='Text Length'))
-                    corrupted_dataset = pd.DataFrame(corrupted_data, columns=['input', 'original_response', 'corrupted_response', 'corrupted_property'])
+                    corrupted_dataset = pd.DataFrame(corrupted_data, columns=['input', 'original_output', 'corrupted_output', 'corrupted_property'])
                     time.sleep(1)
                     percent_complete += 2
-                    corruption_progress_bar.progress(percent_complete, text='Corrupted dataset generated successfully!!')
+                    progress_text = 'Corrupted dataset generated successfully!!'
+                    corruption_progress_bar.progress(percent_complete, text=progress_text)
                     time.sleep(1)
                     corruption_progress_bar.empty()
                     st.session_state.corrupted_dataset = corrupted_dataset
