@@ -7,7 +7,7 @@ def corrupt_readability(model_response, model_response_readability_score, differ
     async def _process(model_response, model_response_readability_score, difference, max_iter):
         if max_iter == 0:
             return model_response.strip()
-        decrease_readability_prompt = CORRUPT_READABILITY_PROMPT.format(model_response=model_response)
+        decrease_readability_prompt = CORRUPT_READABILITY_PROMPT.format(output=model_response)
 
         response = await get_answers_with_backoff(decrease_readability_prompt)
         modified_response_readability_score = readability_score(response)

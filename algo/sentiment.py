@@ -7,7 +7,7 @@ def corrupt_sentiment(model_response, model_response_sentiment_score, difference
     async def _process(model_response, model_response_sentiment_score, difference, max_iter):
         if max_iter == 0:
             return model_response.strip()
-        decrease_sentiment_prompt = CORRUPT_SENTIMENT_PROMPT.format(model_response=model_response)
+        decrease_sentiment_prompt = CORRUPT_SENTIMENT_PROMPT.format(output=model_response)
 
         response = await get_answers_with_backoff(decrease_sentiment_prompt)
         modified_response_sentiment_score = sentiment(response)

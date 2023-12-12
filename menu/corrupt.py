@@ -2,13 +2,14 @@ import streamlit as st
 import asyncio
 import pandas as pd
 import time
-from deepchecks.nlp.utils.text_properties import readability_score, sentiment, text_length
+from deepchecks.nlp.utils.text_properties import readability_score, sentiment, text_length, toxicity
 
 from utils.corrupt_dataset import preprocess_dataset, randomize_dataset, generate_data_for_corrupt_dataframe, generate_dataset_to_download, generate_corrupted_dataframe_to_display
 from algo.readability import corrupt_readability
 from algo.relevance import corrupt_relevance
 from algo.sentiment import corrupt_sentiment
 from algo.text_length import corrupt_text_length
+from algo.toxicity import corrupt_toxicity
 
 
 async def create_corrupt_data_page():
@@ -85,7 +86,8 @@ async def create_corrupt_data_page():
                                                     readability_percent=st.session_state.readability,
                                                     relevance_percent=st.session_state.relevance,
                                                     sentiment_precent=st.session_state.sentiment,
-                                                    text_length_percent=st.session_state.text_length)
+                                                    text_length_percent=st.session_state.text_length,
+                                                    toxicity_percent=st.session_state.toxicity)
                     if st.session_state.readability > 0:
                         time.sleep(1)
                     percent_complete += 5
@@ -131,7 +133,7 @@ async def create_corrupt_data_page():
                     percent_complete += 5
                     progress_text = 'Corrupting toxicity property...' if st.session_state.toxicity > 0 else progress_text
                     corruption_progress_bar.progress(percent_complete, text=progress_text)
-                    # relevance_api_response = await asyncio.gather(*[corrupt_relevance(model_response.strip()) for model_response in random_data['Relevance']['data']])
+                    toxicity_api_response = await asyncio.gather(*[corrupt_toxicity(model_response.strip(), toxicity([model_response.strip()])[0]) for model_response in random_data['Toxicity']['data']])
                     percent_complete += 10
                     progress_text = 'Corrupted toxicity property successfully...' if st.session_state.toxicity > 0 else progress_text
                     corruption_progress_bar.progress(percent_complete, text=progress_text)
@@ -141,17 +143,20 @@ async def create_corrupt_data_page():
                     progress_text = 'Generating the corrupted dataset...'
                     corruption_progress_bar.progress(percent_complete, text=progress_text)
                     corrupted_data.extend(generate_data_for_corrupt_dataframe(random_data=random_data,
-                                                                            corrupted_response=readability_api_response,
-                                                                            corrupted_property='Readability'))
+                                                                              corrupted_response=readability_api_response,
+                                                                              corrupted_property='Readability'))
                     corrupted_data.extend(generate_data_for_corrupt_dataframe(random_data=random_data,
-                                                                            corrupted_response=relevance_api_response,
-                                                                            corrupted_property='Relevance'))
+                                                                              corrupted_response=relevance_api_response,
+                                                                              corrupted_property='Relevance'))
                     corrupted_data.extend(generate_data_for_corrupt_dataframe(random_data=random_data,
-                                                                            corrupted_response=sentiment_api_response,
-                                                                            corrupted_property='Sentiment'))
+                                                                              corrupted_response=sentiment_api_response,
+                                                                              corrupted_property='Sentiment'))
                     corrupted_data.extend(generate_data_for_corrupt_dataframe(random_data=random_data,
-                                                                            corrupted_response=text_length_api_response,
-                                                                            corrupted_property='Text Length'))
+                                                                              corrupted_response=text_length_api_response,
+                                                                              corrupted_property='Text Length'))
+                    corrupted_data.extend(generate_data_for_corrupt_dataframe(random_data=random_data,
+                                                                              corrupted_response=toxicity_api_response,
+                                                                              corrupted_property='Toxicity'))
                     corrupted_dataset = pd.DataFrame(corrupted_data, columns=['input', 'original_output', 'corrupted_output', 'corrupted_property'])
                     time.sleep(1)
                     percent_complete += 2

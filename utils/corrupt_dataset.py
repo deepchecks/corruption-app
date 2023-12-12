@@ -11,17 +11,19 @@ def randomize_dataset(model_responses: pd.Series,
                       readability_percent: int,
                       relevance_percent: int,
                       sentiment_precent: int,
-                      text_length_percent: int):
+                      text_length_percent: int,
+                      toxicity_percent: int):
     percentages = {
         'Readability': readability_percent,
         'Relevance': relevance_percent,
         'Sentiment': sentiment_precent,
-        'Text Length': text_length_percent
+        'Text Length': text_length_percent,
+        'Toxicity': toxicity_percent
     }
     total_size = len(model_responses)
 
     # Generate random indices for the combined sample
-    sample_size = int(total_size * (readability_percent + relevance_percent + sentiment_precent + text_length_percent) / 100)
+    sample_size = int(total_size * (readability_percent + relevance_percent + sentiment_precent + text_length_percent + toxicity_percent) / 100)
     random_indices = np.random.choice(total_size, size=sample_size, replace=False)
 
     # Create a dictionary to store the random responses
