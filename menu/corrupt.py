@@ -2,6 +2,7 @@ import streamlit as st
 import asyncio
 import pandas as pd
 import time
+from st_aggrid import AgGrid, GridOptionsBuilder
 from deepchecks.nlp.utils.text_properties import readability_score, sentiment, text_length, toxicity
 
 from utils.corrupt_dataset import preprocess_dataset, randomize_dataset, generate_data_for_corrupt_dataframe, generate_dataset_to_download, generate_corrupted_dataframe_to_display
@@ -88,8 +89,7 @@ async def create_corrupt_data_page():
                                                     sentiment_precent=st.session_state.sentiment,
                                                     text_length_percent=st.session_state.text_length,
                                                     toxicity_percent=st.session_state.toxicity)
-                    if st.session_state.readability > 0:
-                        time.sleep(1)
+                    time.sleep(1)
                     percent_complete += 5
                     progress_text = 'Corrupting readability property...' if st.session_state.readability > 0 else progress_text
                     corruption_progress_bar.progress(percent_complete, text=progress_text)
@@ -98,8 +98,7 @@ async def create_corrupt_data_page():
                     progress_text = 'Corrupted readability property successfully...' if st.session_state.readability > 0 else progress_text
                     corruption_progress_bar.progress(percent_complete, text=progress_text)
 
-                    if st.session_state.sentiment > 0:
-                        time.sleep(1)
+                    time.sleep(1)
                     percent_complete += 5
                     progress_text = 'Corrupting sentiment property...' if st.session_state.sentiment > 0 else progress_text
                     corruption_progress_bar.progress(percent_complete, text=progress_text)
@@ -108,8 +107,7 @@ async def create_corrupt_data_page():
                     progress_text = 'Corrupted sentiment property successfully...' if st.session_state.sentiment > 0 else progress_text
                     corruption_progress_bar.progress(percent_complete, text=progress_text)
 
-                    if st.session_state.text_length > 0:
-                        time.sleep(1)
+                    time.sleep(1)
                     percent_complete += 5
                     progress_text = 'Corrupting text length property...' if st.session_state.text_length > 0 else progress_text
                     corruption_progress_bar.progress(percent_complete, text=progress_text)
@@ -118,8 +116,7 @@ async def create_corrupt_data_page():
                     progress_text = 'Corrupted text length property successfully...' if st.session_state.text_length > 0 else progress_text
                     corruption_progress_bar.progress(percent_complete, text=progress_text)
 
-                    if st.session_state.relevance > 0:
-                        time.sleep(1)
+                    time.sleep(1)
                     percent_complete += 5
                     progress_text = 'Corrupting relevance property...' if st.session_state.relevance > 0 else progress_text
                     corruption_progress_bar.progress(percent_complete, text=progress_text)
@@ -128,8 +125,7 @@ async def create_corrupt_data_page():
                     progress_text = 'Corrupted relevance property successfully...' if st.session_state.relevance > 0 else progress_text
                     corruption_progress_bar.progress(percent_complete, text=progress_text)
 
-                    if st.session_state.toxicity > 0:
-                        time.sleep(1)
+                    time.sleep(1)
                     percent_complete += 5
                     progress_text = 'Corrupting toxicity property...' if st.session_state.toxicity > 0 else progress_text
                     corruption_progress_bar.progress(percent_complete, text=progress_text)
@@ -170,7 +166,20 @@ async def create_corrupt_data_page():
                     st.write(e)
             if len(st.session_state.corrupted_dataset) > 0:
                 dataframe_to_display = generate_corrupted_dataframe_to_display(st.session_state.corrupted_dataset, 2)
-                st.dataframe(dataframe_to_display, hide_index=True)
+                gb = GridOptionsBuilder()
+                gb.configure_column('input', 'Input', width=100, wrapText=True, autoHeight=True)
+                gb.configure_column('original_output', 'Original Output', wrapText=True, autoHeight=True)
+                gb.configure_column('corrupted_output', 'Corrupted Output', wrapText=True, autoHeight=True)
+                gb.configure_column('corrupted_property', 'Corruption Type', width=80, wrapText=True, autoHeight=True)
+                AgGrid(dataframe_to_display, height = 350, fit_columns_on_grid_load=True, gridOptions=gb.build())
+                # st.dataframe(dataframe_to_display,
+                #              hide_index=True,
+                #              column_config={
+                #                  'input': st.column_config.TextColumn("Input"),
+                #                  'original_output': st.column_config.TextColumn("Original Output"),
+                #                  'corrupted_output': st.column_config.TextColumn("Corrupted Output"),
+                #                  'corrupted_property': st.column_config.TextColumn("Corruption Type")
+                #             })
                 merged_dataset = generate_dataset_to_download(st.session_state.dataset, st.session_state.corrupted_dataset)
                 st.download_button(label='Download corrupted dataset',
                                    data=merged_dataset.to_csv(index=False).encode('utf-8'),
