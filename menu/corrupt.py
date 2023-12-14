@@ -129,7 +129,7 @@ async def create_corrupt_data_page():
                     percent_complete += 5
                     progress_text = 'Corrupting toxicity property...' if st.session_state.toxicity > 0 else progress_text
                     corruption_progress_bar.progress(percent_complete, text=progress_text)
-                    toxicity_api_response = await asyncio.gather(*[corrupt_toxicity(model_response.strip(), toxicity([model_response.strip()], models_storage='./mount/src/corruption-app/.models')[0]) for model_response in random_data['Toxicity']['data']])
+                    toxicity_api_response = await asyncio.gather(*[corrupt_toxicity(model_response.strip(), toxicity([model_response.strip()], models_storage=st.session_state.toxicity_model_path)[0]) for model_response in random_data['Toxicity']['data']])
                     percent_complete += 10
                     progress_text = 'Corrupted toxicity property successfully...' if st.session_state.toxicity > 0 else progress_text
                     corruption_progress_bar.progress(percent_complete, text=progress_text)

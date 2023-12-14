@@ -99,4 +99,6 @@ def initialize_session_state():
         st.session_state.toxicity = 0
     if "hallucination" not in st.session_state:
         st.session_state.hallucination = 0
+    if "toxicity_model_path" not in st.session_state:
+        st.session_state.toxicity_model_path = './mount/src/corruption-app/.models'
 
