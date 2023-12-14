@@ -153,6 +153,9 @@ async def create_corrupt_data_page():
                     corrupted_data.extend(generate_data_for_corrupt_dataframe(random_data=random_data,
                                                                               corrupted_response=toxicity_api_response,
                                                                               corrupted_property='Toxicity'))
+                    st.write(generate_data_for_corrupt_dataframe(random_data=random_data,
+                                                                              corrupted_response=toxicity_api_response,
+                                                                              corrupted_property='Toxicity'))
                     corrupted_dataset = pd.DataFrame(corrupted_data, columns=['input', 'original_output', 'corrupted_output', 'corrupted_property'])
                     time.sleep(1)
                     percent_complete += 2
@@ -172,6 +175,7 @@ async def create_corrupt_data_page():
                 gb.configure_column('corrupted_output', 'Corrupted Output', wrapText=True, autoHeight=True)
                 gb.configure_column('corrupted_property', 'Corruption Type', width=80, wrapText=True, autoHeight=True)
                 AgGrid(dataframe_to_display, height = 350, fit_columns_on_grid_load=True, gridOptions=gb.build())
+                st.write(dataframe_to_display)
                 # st.dataframe(dataframe_to_display,
                 #              hide_index=True,
                 #              column_config={
