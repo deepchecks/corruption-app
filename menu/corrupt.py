@@ -189,6 +189,7 @@ async def create_corrupt_data_page():
                 merged_dataset = generate_dataset_to_download(st.session_state.dataset, st.session_state.corrupted_dataset)
                 st.download_button(label='Download corrupted dataset',
                                    data=merged_dataset.to_csv(index=False).encode('utf-8'),
-                                   file_name='corrupted_dataset.csv')
+                                   file_name='corrupted_dataset.csv',
+                                   help='Download the corrupted dataset ready to upload for LLM evaluation app.')
 
 
