@@ -174,15 +174,8 @@ async def create_corrupt_data_page():
                 gb.configure_column('original_output', 'Original Output', wrapText=True, autoHeight=True)
                 gb.configure_column('corrupted_output', 'Corrupted Output', wrapText=True, autoHeight=True)
                 gb.configure_column('corrupted_property', 'Corruption Type', width=80, wrapText=True, autoHeight=True)
-                AgGrid(dataframe_to_display, height = 350, fit_columns_on_grid_load=True, gridOptions=gb.build())
-                # st.dataframe(dataframe_to_display,
-                #              hide_index=True,
-                #              column_config={
-                #                  'input': st.column_config.TextColumn("Input"),
-                #                  'original_output': st.column_config.TextColumn("Original Output"),
-                #                  'corrupted_output': st.column_config.TextColumn("Corrupted Output"),
-                #                  'corrupted_property': st.column_config.TextColumn("Corruption Type")
-                #             })
+                AgGrid(dataframe_to_display, height=350, fit_columns_on_grid_load=True,
+                       gridOptions=gb.build(), enable_enterprise_modules=False)
                 merged_dataset = generate_dataset_to_download(st.session_state.dataset, st.session_state.corrupted_dataset)
                 st.download_button(label='Download corrupted dataset',
                                    data=merged_dataset.to_csv(index=False).encode('utf-8'),
