@@ -60,20 +60,19 @@ def generate_data_for_corrupt_dataframe(random_data: dict, corrupted_response: p
 def generate_dataset_to_download(dataset: pd.DataFrame, corrupted_dataset: pd.DataFrame):
 
     dataset_to_download = []
+    if 'annotation' not in list(dataset.columns):
+        dataset['annotation'] = [''] * len(dataset)
     all_cols = list(dataset.columns)
     for idx in range(len(dataset)):
         data = []
+        corrupted_record = corrupted_dataset[corrupted_dataset['input'] == dataset.iloc[idx]['input']]
         for col in all_cols:
-            if col in ['annotation', 'output']:
-                corrupted_record = corrupted_dataset[corrupted_dataset['input'] == dataset.iloc[idx]['input']]
-                if len(corrupted_record) > 0 and col == 'output':
-                    data.append(corrupted_record.iloc[0]['corrupted_output'])
-                    continue
-                elif len(corrupted_record) > 0 and col == 'annotation':
-                    data.append("")
-                    continue
-            data.append(dataset.iloc[idx][col])
-
+            if len(corrupted_record) > 0 and col == 'output':
+                data.append(corrupted_record.iloc[0]['corrupted_output'])
+            elif len(corrupted_record) > 0 and col == 'annotation':
+                data.append('Bad')
+            else:
+                data.append(dataset.iloc[idx][col])
         dataset_to_download.append(data)
     return pd.DataFrame(dataset_to_download, columns=all_cols)
 
