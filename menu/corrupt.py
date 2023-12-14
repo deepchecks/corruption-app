@@ -13,14 +13,18 @@ from algo.text_length import corrupt_text_length
 from algo.toxicity import corrupt_toxicity
 
 
+def reset_session_state():
+    st.session_state.corrupted_dataset = pd.DataFrame()
+
+
 async def create_corrupt_data_page():
 
     st.header('Corrupt Data')
 
-    st.markdown("""You can upload your data as csv or excel files and corrupt the data according to the properties in the Settings section""")
+    st.markdown("""You can upload your data as csv or excel files and corrupt the number of samples per text property.""")
     cols = st.columns([0.7, 0.3])
     with cols[0]:
-        upload_file = st.file_uploader("Upload CSV", type=['csv','xls','xlsx'], label_visibility="hidden")
+        upload_file = st.file_uploader("Upload CSV", type=['csv','xls','xlsx'], label_visibility="hidden", on_change=reset_session_state)
     with cols[1]:
         st.markdown('<div style="padding:23px;">',unsafe_allow_html=True)
         st.download_button(label='Example dataset',
@@ -54,20 +58,21 @@ async def create_corrupt_data_page():
             if is_valid_dataframe:
                 st.session_state.dataset = dataframe.iloc[0: 1000]
         if len(st.session_state.dataset) > 0:
+            max_rows_to_corrupt_per_property = int(0.05 * len(st.session_state.dataset))
             row_one = st.columns(3)
             row_two = st.columns(3)
             with row_one[0]:
-                readability_percent = st.slider("Readability", 0, 5, st.session_state.readability)
+                readability_percent = st.slider("Readability", 0, max_rows_to_corrupt_per_property, st.session_state.readability)
             with row_one[1]:
-                sentiment_percent = st.slider("Sentiment", 0, 5, st.session_state.sentiment)
+                sentiment_percent = st.slider("Sentiment", 0, max_rows_to_corrupt_per_property, st.session_state.sentiment)
             with row_one[2]:
-                text_length_percent = st.slider("Text Length", 0, 5, st.session_state.text_length)
+                text_length_percent = st.slider("Text Length", 0, max_rows_to_corrupt_per_property, st.session_state.text_length)
             with row_two[0]:
-                toxicity_percent = st.slider("Toxicity", 0, 5, st.session_state.toxicity)
+                toxicity_percent = st.slider("Toxicity", 0, max_rows_to_corrupt_per_property, st.session_state.toxicity)
             with row_two[1]:
-                relevance_percent = st.slider("Relevance", 0, 5, st.session_state.relevance)
+                relevance_percent = st.slider("Relevance", 0, max_rows_to_corrupt_per_property, st.session_state.relevance)
             with row_two[2]:
-                hallucination_percent = st.slider("Hallucination", 0, 5, st.session_state.hallucination)
+                hallucination_percent = st.slider("Hallucination", 0, max_rows_to_corrupt_per_property, st.session_state.hallucination)
 
             corrupt_data = st.button(label='Corrupt Dataset',
                                      key='corrupt_data_button',
@@ -87,11 +92,11 @@ async def create_corrupt_data_page():
                 try:
                     preprocessed_data = preprocess_dataset(st.session_state.dataset)
                     random_data = randomize_dataset(model_responses=preprocessed_data['output'], 
-                                                    readability_percent=st.session_state.readability,
-                                                    relevance_percent=st.session_state.relevance,
-                                                    sentiment_precent=st.session_state.sentiment,
-                                                    text_length_percent=st.session_state.text_length,
-                                                    toxicity_percent=st.session_state.toxicity)
+                                                    num_readability_samples=st.session_state.readability,
+                                                    num_relevance_samples=st.session_state.relevance,
+                                                    num_sentiment_samples=st.session_state.sentiment,
+                                                    num_text_length_samples=st.session_state.text_length,
+                                                    num_toxicity_samples=st.session_state.toxicity)
                     time.sleep(1)
                     percent_complete += 5
                     progress_text = 'Corrupting readability property...' if st.session_state.readability > 0 else progress_text
