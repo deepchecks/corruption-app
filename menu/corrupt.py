@@ -76,7 +76,7 @@ async def create_corrupt_data_page():
 
             corrupt_data = st.button(label='Corrupt Dataset',
                                      key='corrupt_data_button',
-                                     help='Corrupt dataset basaed on the percentage of data selected for each property in settings section')
+                                     help='Corrupt dataset basaed on the number of samples selected for each property.')
             if corrupt_data:
                 st.session_state.readability = int(readability_percent)
                 st.session_state.relevance = int(relevance_percent)
