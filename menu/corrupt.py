@@ -77,7 +77,7 @@ async def create_corrupt_data_page():
                 st.session_state.hallucination = int(hallucination_percent)
                 st.session_state.toxicity = int(toxicity_percent)
 
-                progress_text = "Corrupting the data. Please wait."
+                progress_text = "Corrupting the data. Please wait..."
                 percent_complete = 0
                 corruption_progress_bar = st.progress(0, text=progress_text)
                 corrupted_data = []
@@ -174,8 +174,8 @@ async def create_corrupt_data_page():
                 gb.configure_column('original_output', 'Original Output', wrapText=True, autoHeight=True)
                 gb.configure_column('corrupted_output', 'Corrupted Output', wrapText=True, autoHeight=True)
                 gb.configure_column('corrupted_property', 'Corruption Type', width=80, wrapText=True, autoHeight=True)
-                AgGrid(dataframe_to_display, height = 350, fit_columns_on_grid_load=True, gridOptions=gb.build())
                 st.write(dataframe_to_display)
+                AgGrid(dataframe_to_display, height = 350, fit_columns_on_grid_load=True, gridOptions=gb.build())
                 # st.dataframe(dataframe_to_display,
                 #              hide_index=True,
                 #              column_config={
