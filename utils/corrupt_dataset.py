@@ -80,7 +80,7 @@ def generate_dataset_to_download(dataset: pd.DataFrame, corrupted_dataset: pd.Da
         data.append(response)
         data.append(annotation)
         dataset_to_download.append(data)
-    column_names = ['unique_interaction_id', 'input', 'information_retrieval', 'full_prompt', 'output', 'annotation'] if unique_interaction_id_present else ['input', 'information_retrieval', 'full_prompt', 'output', 'annotation']
+    column_names = (['unique_interaction_id'] if unique_interaction_id_present else []) + ['input', 'information_retrieval', 'full_prompt', 'output', 'annotation']
     return pd.DataFrame(dataset_to_download, columns=column_names)
 
 
