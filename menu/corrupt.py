@@ -33,8 +33,8 @@ async def create_corrupt_data_page():
                            data = pd.DataFrame(data=[['Input 1', 'IR 1', 'Prompt 1', 'Output 1', 'Good'],
                                                      ['Input 2', 'IR 2', 'Prompt 2', 'Output 2', ''],
                                                      ['Input 3', 'IR 3', 'Prompt 3', 'Output 3', 'Bad']],
-                                               columns=['input', 'information_retrieval', 'full_prompt', 'output', 'annotation']).to_csv().encode('utf-8'),
-                           file_name='corrupted_dataset.csv')
+                                               columns=['input', 'information_retrieval', 'full_prompt', 'output', 'annotation']).to_csv(index=False).encode('utf-8'),
+                           file_name='sample_dataset.csv')
         st.markdown('</div>',unsafe_allow_html=True)
 
     if upload_file is not None:
