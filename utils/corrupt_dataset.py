@@ -58,6 +58,9 @@ def generate_data_for_corrupt_dataframe(random_data: dict, corrupted_response: p
 def generate_dataset_to_download(dataset: pd.DataFrame, corrupted_dataset: pd.DataFrame):
 
     dataset_to_download = []
+    unique_interaction_id_present = False
+    if 'unique_interaction_id' in dataset.columns:
+        unique_interaction_id_present = True
     for idx in range(len(dataset)):
         data = []
         input = dataset.iloc[idx]['input']
@@ -69,13 +72,16 @@ def generate_dataset_to_download(dataset: pd.DataFrame, corrupted_dataset: pd.Da
         if len(corrupted_record) > 0:
             response = corrupted_record.iloc[0]['corrupted_output']
             annotation = ""
+        if unique_interaction_id_present:
+            data.append(dataset.iloc[idx]['unique_interaction_id'])
         data.append(input)
         data.append(information_retrieval)
         data.append(full_prompt)
         data.append(response)
         data.append(annotation)
         dataset_to_download.append(data)
-    return pd.DataFrame(dataset_to_download, columns=['input', 'information_retrieval', 'full_prompt', 'output', 'annotation'])
+    column_names = ['unique_interaction_id', 'input', 'information_retrieval', 'full_prompt', 'output', 'annotation'] if unique_interaction_id_present else ['input', 'information_retrieval', 'full_prompt', 'output', 'annotation']
+    return pd.DataFrame(dataset_to_download, columns=column_names)
 
 
 def generate_corrupted_dataframe_to_display(corrupted_dataset: pd.DataFrame, MAX_ROWS_PER_PROP: int):
