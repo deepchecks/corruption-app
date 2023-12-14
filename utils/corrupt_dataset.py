@@ -12,18 +12,20 @@ def randomize_dataset(model_responses: pd.Series,
                       num_relevance_samples: int,
                       num_sentiment_samples: int,
                       num_text_length_samples: int,
-                      num_toxicity_samples: int):
+                      num_toxicity_samples: int,
+                      num_hallucination_samples: int):
     percentages = {
         'Readability': num_readability_samples,
         'Relevance': num_relevance_samples,
         'Sentiment': num_sentiment_samples,
         'Text Length': num_text_length_samples,
-        'Toxicity': num_toxicity_samples
+        'Toxicity': num_toxicity_samples,
+        'Hallucination': num_hallucination_samples,
     }
     total_size = len(model_responses)
 
     # Generate random indices for the combined sample
-    sample_size = num_readability_samples + num_relevance_samples + num_sentiment_samples + num_text_length_samples + num_toxicity_samples
+    sample_size = num_readability_samples + num_relevance_samples + num_sentiment_samples + num_text_length_samples + num_toxicity_samples + num_hallucination_samples
     random_indices = np.random.choice(total_size, size=sample_size, replace=False)
 
     # Create a dictionary to store the random responses
@@ -76,14 +78,10 @@ def generate_dataset_to_download(dataset: pd.DataFrame, corrupted_dataset: pd.Da
     return pd.DataFrame(dataset_to_download, columns=all_cols)
 
 
-def generate_corrupted_dataframe_to_display(corrupted_dataset: pd.DataFrame, MAX_ROWS_PER_PROP: int):
+def generate_corrupted_dataframe_to_display(corrupted_dataset: pd.DataFrame):
 
-    corrupted_property_count = {prop: 0 for prop in set(corrupted_dataset['corrupted_property'])}
     dataframe_to_display = pd.DataFrame(columns=['input', 'original_output', 'corrupted_output', 'corrupted_property'])
     for idx in range(len(corrupted_dataset)):
-        if corrupted_property_count[corrupted_dataset.iloc[idx]['corrupted_property']] >= MAX_ROWS_PER_PROP:
-            continue
-        corrupted_property_count[corrupted_dataset.iloc[idx]['corrupted_property']] += 1
         df = pd.DataFrame({'input': [corrupted_dataset.iloc[idx]['input']],
                            'original_output': [corrupted_dataset.iloc[idx]['original_output']],
                            'corrupted_output': [corrupted_dataset.iloc[idx]['corrupted_output']],

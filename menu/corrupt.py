@@ -11,7 +11,7 @@ from algo.relevance import corrupt_relevance
 from algo.sentiment import corrupt_sentiment
 from algo.text_length import corrupt_text_length
 from algo.toxicity import corrupt_toxicity
-
+from algo.hallucination import corrupt_hallucination
 
 def reset_session_state():
     st.session_state.corrupted_dataset = pd.DataFrame()
@@ -33,7 +33,7 @@ async def create_corrupt_data_page():
                             \n- information_retrieval - the information supplied as context to the llm \
                             \n- full_prompt - the full text sent to the LLM \
                             \n- output - the pipeline final output \
-                            \n- annotation - either good/bad/empty''',
+                            \n- annotation - either good/bad/empty (optional)''',
                            data = pd.DataFrame(data=[['Input 1', 'IR 1', 'Prompt 1', 'Output 1', 'Good'],
                                                      ['Input 2', 'IR 2', 'Prompt 2', 'Output 2', ''],
                                                      ['Input 3', 'IR 3', 'Prompt 3', 'Output 3', 'Bad']],
@@ -45,7 +45,7 @@ async def create_corrupt_data_page():
         with st.spinner('Uploading dataset...'):
             dataframe = pd.read_csv(upload_file, encoding='latin-1') if upload_file.type != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' else pd.read_excel(upload_file)
             is_valid_dataframe = True
-            cols_to_check = ['input', 'information_retrieval', 'full_prompt', 'output', 'annotation']
+            cols_to_check = ['input', 'output']
             for col in cols_to_check:
                 if col not in dataframe.columns:
                     is_valid_dataframe = False
@@ -98,7 +98,8 @@ async def create_corrupt_data_page():
                                                     num_relevance_samples=st.session_state.relevance,
                                                     num_sentiment_samples=st.session_state.sentiment,
                                                     num_text_length_samples=st.session_state.text_length,
-                                                    num_toxicity_samples=st.session_state.toxicity)
+                                                    num_toxicity_samples=st.session_state.toxicity,
+                                                    num_hallucination_samples=st.session_state.hallucination)
                     if st.session_state.readability:
                         time.sleep(1)
                         percent_complete += int(100 * 0.5/num_properties_to_corrupt)
@@ -120,7 +121,6 @@ async def create_corrupt_data_page():
                         corrupted_data.extend(generate_data_for_corrupt_dataframe(random_data=random_data,
                                                                                   corrupted_response=sentiment_api_response,
                                                                                   corrupted_property='Sentiment'))
-
 
                     if st.session_state.text_length:
                         time.sleep(1)
@@ -154,8 +154,16 @@ async def create_corrupt_data_page():
                         corrupted_data.extend(generate_data_for_corrupt_dataframe(random_data=random_data,
                                                                                   corrupted_response=toxicity_api_response,
                                                                                   corrupted_property='Toxicity'))
-
-
+                    if st.session_state.hallucination:
+                        time.sleep(1)
+                        percent_complete += int(100 * 0.5/num_properties_to_corrupt)
+                        corruption_progress_bar.progress(percent_complete, text='Corrupting hallucination property...')
+                        hallucination_api_response = await asyncio.gather(*[corrupt_hallucination(model_response.strip()) for model_response in random_data['Hallucination']['data']])
+                        percent_complete += int(100 * 0.5/num_properties_to_corrupt)
+                        corruption_progress_bar.progress(percent_complete, text='Corrupted hallucination property successfully...')
+                        corrupted_data.extend(generate_data_for_corrupt_dataframe(random_data=random_data,
+                                                                                  corrupted_response=hallucination_api_response,
+                                                                                  corrupted_property='Hallucination'))
                     time.sleep(1)
                     percent_complete += int(100 * 0.5/num_properties_to_corrupt)
                     corruption_progress_bar.progress(percent_complete, text='Generating the corrupted dataset...')
@@ -170,7 +178,7 @@ async def create_corrupt_data_page():
                     corruption_progress_bar.empty()
                     st.write(e)
             if len(st.session_state.corrupted_dataset) > 0:
-                dataframe_to_display = generate_corrupted_dataframe_to_display(st.session_state.corrupted_dataset, 2)
+                dataframe_to_display = generate_corrupted_dataframe_to_display(st.session_state.corrupted_dataset)
                 gb = GridOptionsBuilder()
                 gb.configure_column('input', 'Input', width=100, wrapText=True, autoHeight=True)
                 gb.configure_column('original_output', 'Original Output', wrapText=True, autoHeight=True)
