@@ -30,7 +30,7 @@ async def create_corrupt_data_page():
                             \n- full_prompt - the full text sent to the LLM \
                             \n- output - the pipeline final output \
                             \n- annotation - either good/bad/empty''',
-                           data='hello',
+                           data = pd.DataFrame(columns=['input', 'information_retrieval', 'full_prompt', 'output', 'annotation']),
                            file_name='corrupted_dataset.csv')
         st.markdown('</div>',unsafe_allow_html=True)
 
