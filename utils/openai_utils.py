@@ -1,6 +1,8 @@
-import openai
-from tenacity import retry, stop_after_attempt, stop_after_delay, wait_random_exponential
 import os
+
+import openai
+from tenacity import (retry, stop_after_attempt, stop_after_delay,
+                      wait_random_exponential)
 
 
 @retry(wait=wait_random_exponential(min=1, max=30), stop=stop_after_attempt(5) | stop_after_delay(60))

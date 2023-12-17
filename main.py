@@ -1,9 +1,9 @@
 """Python file to serve as the frontend"""
-import streamlit as st
+import asyncio
+
+from menu.corrupt import create_corrupt_data_page
 from utils.config import load_config
 from utils.general_utils import initialize_app, initialize_session_state
-from menu.corrupt import create_corrupt_data_page
-import asyncio
 
 try:
     loop = asyncio.get_event_loop()

@@ -1,5 +1,5 @@
-from utils.openai_utils import get_answers_with_backoff
 from algo.prompts import CORRUPT_HALLUCINATION_PROMPT
+from utils.openai_utils import get_answers_with_backoff
 
 
 def corrupt_hallucination(input, output):

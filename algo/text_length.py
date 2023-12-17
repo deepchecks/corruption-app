@@ -1,6 +1,8 @@
 from deepchecks.nlp.utils.text_properties import text_length
-from utils.openai_utils import get_answers_with_backoff
+
 from algo.prompts import CORRUPT_TEXT_LENGTH_PROMPT
+from utils.openai_utils import get_answers_with_backoff
+
 
 def corrupt_text_length(model_response, model_response_text_length_score, difference = 250, max_iter = 3):
 

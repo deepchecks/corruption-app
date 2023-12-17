@@ -1,5 +1,7 @@
-from dotenv import dotenv_values
 import os
+
+from dotenv import dotenv_values
+
 
 def load_config():
     """Load all the required credentials from the .env file or streamlit cloud.

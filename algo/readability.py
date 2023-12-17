@@ -1,6 +1,8 @@
 from deepchecks.nlp.utils.text_properties import readability_score
-from utils.openai_utils import get_answers_with_backoff
+
 from algo.prompts import CORRUPT_READABILITY_PROMPT
+from utils.openai_utils import get_answers_with_backoff
+
 
 def corrupt_readability(model_response, model_response_readability_score, difference = 15, max_iter = 3):
 

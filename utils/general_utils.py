@@ -1,11 +1,11 @@
-import platform
 import pathlib
-from PIL import Image
+import platform
 from pathlib import Path
-import streamlit as st
-from streamlit_option_menu import option_menu
 
 import pandas as pd
+import streamlit as st
+from PIL import Image
+from streamlit_option_menu import option_menu
 
 if platform.system() == 'Windows':
     pathlib.PosixPath = pathlib.WindowsPath
