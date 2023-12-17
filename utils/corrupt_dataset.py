@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import streamlit as st
+from st_aggrid import AgGrid, GridOptionsBuilder
 
 
 def preprocess_dataset(dataset: pd.DataFrame):
@@ -87,3 +88,14 @@ def generate_corrupted_dataframe_to_display(corrupted_dataset: pd.DataFrame):
                            'corrupted_property': [corrupted_dataset.iloc[idx]['corrupted_property']]})
         dataframe_to_display = pd.concat([dataframe_to_display, df], ignore_index=True)
     return dataframe_to_display
+
+
+def display_corrupted_data():
+    dataframe_to_display = generate_corrupted_dataframe_to_display(st.session_state.corrupted_dataset)
+    gb = GridOptionsBuilder()
+    gb.configure_column('input', 'Input', width=100, wrapText=True, autoHeight=True)
+    gb.configure_column('original_output', 'Original Output', wrapText=True, autoHeight=True)
+    gb.configure_column('corrupted_output', 'Corrupted Output', wrapText=True, autoHeight=True)
+    gb.configure_column('corrupted_property', 'Corruption Type', width=80, wrapText=True, autoHeight=True)
+    AgGrid(dataframe_to_display, height=350, fit_columns_on_grid_load=True, gridOptions=gb.build(), enable_enterprise_modules=False)
+

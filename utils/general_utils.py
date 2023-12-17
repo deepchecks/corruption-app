@@ -102,3 +102,21 @@ def initialize_session_state():
     if "toxicity_model_path" not in st.session_state:
         st.session_state.toxicity_model_path = './mount/src/corruption-app/.models'
 
+def display_slider(max_percent_of_samples_to_corrupt_per_prop):
+    max_rows_to_corrupt_per_property = int(max_percent_of_samples_to_corrupt_per_prop * len(st.session_state.dataset))
+    row_one = st.columns(3)
+    row_two = st.columns(3)
+    with row_one[0]:
+        readability_percent = st.slider("Readability", 0, max_rows_to_corrupt_per_property, st.session_state.readability)
+    with row_one[1]:
+        sentiment_percent = st.slider("Sentiment", 0, max_rows_to_corrupt_per_property, st.session_state.sentiment)
+    with row_one[2]:
+        text_length_percent = st.slider("Text Length", 0, max_rows_to_corrupt_per_property, st.session_state.text_length)
+    with row_two[0]:
+        toxicity_percent = st.slider("Toxicity", 0, max_rows_to_corrupt_per_property, st.session_state.toxicity)
+    with row_two[1]:
+        relevance_percent = st.slider("Relevance", 0, max_rows_to_corrupt_per_property, st.session_state.relevance)
+    with row_two[2]:
+        hallucination_percent = st.slider("Hallucination", 0, max_rows_to_corrupt_per_property, st.session_state.hallucination)
+    return readability_percent,sentiment_percent,text_length_percent,toxicity_percent,relevance_percent,hallucination_percent
+
