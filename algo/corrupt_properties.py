@@ -67,7 +67,7 @@ async def apply_corruption(percent_complete, corruption_progress_bar, num_proper
         time.sleep(1)
         percent_complete += int(100 * 0.5/num_properties_to_corrupt)
         corruption_progress_bar.progress(percent_complete, text='Corrupting relevance property...')
-        relevance_api_response = await asyncio.gather(*[corrupt_relevance(model_response.strip()) for model_response in random_data['Relevance']['data']])
+        relevance_api_response = await asyncio.gather(*[corrupt_relevance(preprocessed_data.iloc[random_data['Relevance']['indices'][idx]]['input'], model_response.strip()) for idx, model_response in enumerate(random_data['Relevance']['data'])])
         percent_complete += int(100 * 0.5/num_properties_to_corrupt)
         corruption_progress_bar.progress(percent_complete, text='Corrupted relevance property successfully...')
         corrupted_data.extend(generate_data_for_corrupt_dataframe(random_data=random_data,
