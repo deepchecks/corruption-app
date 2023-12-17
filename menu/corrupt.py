@@ -158,12 +158,13 @@ async def create_corrupt_data_page():
                         time.sleep(1)
                         percent_complete += int(100 * 0.5/num_properties_to_corrupt)
                         corruption_progress_bar.progress(percent_complete, text='Corrupting hallucination property...')
-                        hallucination_api_response = await asyncio.gather(*[corrupt_hallucination(model_response.strip()) for model_response in random_data['Hallucination']['data']])
+                        hallucination_api_response = await asyncio.gather(*[corrupt_hallucination(preprocessed_data.iloc[random_data['Hallucination']['indices'][idx]]['input'], model_response.strip()) for idx, model_response in enumerate(random_data['Hallucination']['data'])])
                         percent_complete += int(100 * 0.5/num_properties_to_corrupt)
                         corruption_progress_bar.progress(percent_complete, text='Corrupted hallucination property successfully...')
                         corrupted_data.extend(generate_data_for_corrupt_dataframe(random_data=random_data,
                                                                                   corrupted_response=hallucination_api_response,
                                                                                   corrupted_property='Hallucination'))
+
                     time.sleep(1)
                     percent_complete += int(100 * 0.5/num_properties_to_corrupt)
                     corruption_progress_bar.progress(percent_complete, text='Generating the corrupted dataset...')

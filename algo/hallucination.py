@@ -1,13 +1,15 @@
 from utils.openai_utils import get_answers_with_backoff
+from algo.prompts import CORRUPT_HALLUCINATION_PROMPT
 
-def corrupt_hallucination(model_response):
 
-    async def _process(model_response):
+def corrupt_hallucination(input, output):
 
-        # corrupt_relevance_prompt = CORRUP_RELEVANCE_PROMPT.format(number_of_words=len(model_response.split()))
+    async def _process(input, output):
 
-        # response = await get_answers_with_backoff(corrupt_relevance_prompt)
-        return model_response.strip()
+        corrupt_hallucination_prompt = CORRUPT_HALLUCINATION_PROMPT.format(input=input, output=output)
 
-    return _process(model_response)
+        response = await get_answers_with_backoff(corrupt_hallucination_prompt)
+        return response.strip()
+
+    return _process(input, output)
 
